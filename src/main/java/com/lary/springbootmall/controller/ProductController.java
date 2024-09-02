@@ -6,11 +6,15 @@ import com.lary.springbootmall.dto.ProductRequest;
 import com.lary.springbootmall.model.Product;
 import com.lary.springbootmall.service.ProductService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+@Validated
 @RestController
 public class ProductController {
 
@@ -24,7 +28,10 @@ public class ProductController {
             @RequestParam(required = false) String search,
             //排序 sorting
             @RequestParam(defaultValue = "created_date") String orderBy,
-            @RequestParam(defaultValue = "desc") String sort  //小到大或大到小
+            @RequestParam(defaultValue = "desc") String sort,  //小到大或大到小
+            //分頁
+            @RequestParam(defaultValue = "5") @Max(1000) @Min(0) Integer limit,  //要取得幾筆數據
+            @RequestParam(defaultValue = "0") @Min(0) Integer offset  //跳過幾筆數據
             )
     {
         ProductQueryParams productQueryParams = new ProductQueryParams();
@@ -32,6 +39,8 @@ public class ProductController {
         productQueryParams.setSearch(search);
         productQueryParams.setOrderBy(orderBy);
         productQueryParams.setSort(sort);
+        productQueryParams.setLimit(limit);
+        productQueryParams.setOffset(offset);
         List<Product> productList = productService.getProducts(productQueryParams);
         return ResponseEntity.status(HttpStatus.OK).body(productList);
 
